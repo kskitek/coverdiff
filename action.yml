@@ -1,0 +1,45 @@
+name: 'Go cover diff'
+description: ''
+branding:
+  icon: 'eye'
+  color: 'blue'
+inputs:
+  base:
+    description: "Base branch for comparison."
+    required: false
+    default: "main"
+runs:
+  using: 'docker'
+  image: 'golang:alpine-1.20'
+  steps:
+    - name: 'Checkout A'
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+        fetch-depth: '1'
+    - name: 'Generate coverage A'
+      run: go test -cover ./... | grep -v "no test files" | awk '{print $2,$5}' | sed -e 's/%//' > a
+    - name: 'Checkout B'
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ inputs.base }}
+        fetch-depth: '1'
+    - name: 'Generate coverage B'
+      run: go test -cover ./... | grep -v "no test files" | awk '{print $2,$5}' | sed -e 's/%//' > b
+    - name: 'Generate diff'
+      run: |
+        cat a > sum
+        cat b >> sum
+        cat sum | sort | uniq -u > changes
+        awk 'NR % 2 != 0 {pkg=$1; a=$2} NR % 2 == 0 {b=$2; if (a < b) {printf "%s %d% -> %d%", pkg,a,b}}'
+# - name: 'Comment PR'
+#   uses: actions/github-script@v3
+#     with:
+#       github-token: ${{secrets.GITHUB_TOKEN}}
+#       script: |
+#         github.issues.createComment({
+#           issue_number: context.issue.number,
+#           owner: context.repo.owner,
+#           repo: context.repo.repo,
+#           body: '👋 Thanks for reporting!'
+#         })
