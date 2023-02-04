@@ -8,6 +8,7 @@ inputs:
     description: "Base branch for comparison."
     required: false
     default: "main"
+  # TODO add a change threshold to fail the PR if we go below threshold
 runs:
   using: 'docker'
   image: 'golang:alpine-1.20'
@@ -33,7 +34,7 @@ runs:
         cat sum | sort | uniq -u > changes
         awk 'NR % 2 != 0 {pkg=$1; a=$2} NR % 2 == 0 {b=$2; if (a < b) {printf "%s %d% -> %d%", pkg,a,b}}'
 # - name: 'Comment PR'
-#   uses: actions/github-script@v3
+#   uses: actions/github-script@v6
 #     with:
 #       github-token: ${{secrets.GITHUB_TOKEN}}
 #       script: |
