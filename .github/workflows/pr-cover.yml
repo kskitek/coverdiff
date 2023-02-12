@@ -3,7 +3,7 @@ concurrency:
   cancel-in-progress: true
   group: coverdiff-${{ github.ref }}
 
-on: [pull_request_target]
+on: [pull_request]
 
 jobs:
   main:
