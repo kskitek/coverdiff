@@ -21,31 +21,22 @@ jobs:
         go-version: '1.20'
     - name: 'Generate coverage A'
       run: go test -cover ./... | grep -v "no test files" | awk '{print $2,$5}' | sed -e 's/%//' > a.cover
-    - name: 'Save A coverage'
-      uses: actions/cache/save@v3
-      with:
-        path: |
-          a.cover
-        key: cover-${{github.run_id}}
     - name: 'Checkout B'
       uses: actions/checkout@v3
       with:
+        path: main
+        ref: main
+        # ${{ github.event.pull_request.base.sha }}
         # ref: ${{ inputs.base }} TODO
         #ref: main
         fetch-depth: '1'
-    - run: git checkout origin/main
     - name: 'Generate coverage B'
+      working-directory: main
       run: go test -cover ./... | grep -v "no test files" | awk '{print $2,$5}' | sed -e 's/%//' > b.cover
-    - name: 'Restore A coverage'
-      uses: actions/cache/restore@v3
-      with:
-        path: |
-          a.cover
-        key: cover-${{github.run_id}}
     - name: 'Generate diff'
       run: |
         cat a.cover > sum.cover
-        cat b.cover >> sum.cover
+        cat main/b.cover >> sum.cover
         cat sum.cover
         cat sum.cover | sort | uniq -u > changes
         echo "## changes:"
