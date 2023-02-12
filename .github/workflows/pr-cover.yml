@@ -42,3 +42,15 @@ jobs:
           if (a < b) {printf "%s %d% < %d%", pkg,a,b};
           if (a > b) {printf "%s %d% > %d%", pkg,a,b}}' changes.cover > diff
         cat diff
+        CHANGES=$(cat diff | wc -l)
+        echo "CHANGES=$CHANGES" >> $GITHUB_ENV
+        echo "## $CHANGES"
+    - name: 'Test'
+      if: env.CHANGES != null
+      run: echo ${{ env.CHANGES }}
+    - name: 'Comment PR'
+      #if: env.CHANGES != null
+      uses: thollander/actions-comment-pull-request@v2
+      with:
+        message: |
+          There are test changes ${{ env.CHANGES }}
