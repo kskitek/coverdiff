@@ -10,8 +10,11 @@ jobs:
       with:
         ref: ${{ github.event.pull_request.head.sha }}
         fetch-depth: '1'
+    - name: 'Setup Golang'
+      uses: actions/setup-go@v3
+      with:
+        go-version: '1.20'
     - name: 'Generate coverage A'
-      uses: golang:alpine-1.20
       run: go test -cover ./... | grep -v "no test files" | awk '{print $2,$5}' | sed -e 's/%//' > a
     - name: 'Checkout B'
       uses: actions/checkout@v3
@@ -19,7 +22,6 @@ jobs:
         ref: ${{ inputs.base }}
         fetch-depth: '1'
     - name: 'Generate coverage B'
-      uses: golang:alpine-1.20
       run: go test -cover ./... | grep -v "no test files" | awk '{print $2,$5}' | sed -e 's/%//' > b
     - name: 'Generate diff'
       run: |
