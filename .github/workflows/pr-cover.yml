@@ -37,7 +37,8 @@ jobs:
       run: |
         cat a.cover > sum.cover
         cat main/b.cover >> sum.cover
-        cat sum.cover
-        cat sum.cover | sort | uniq -u > changes
-        echo "## changes:"
-        awk 'NR % 2 != 0 {pkg=$1; a=$2} NR % 2 == 0 {b=$2; if (a < b) {printf "%s %d% -> %d%", pkg,a,b}}'
+        cat sum.cover | sort | uniq -u > changes.cover
+        awk 'NR % 2 != 0 {pkg=$1; a=$2} NR % 2 == 0 {b=$2;
+          if (a < b) {printf "%s %d% < %d%", pkg,a,b};
+          if (a > b) {printf "%s %d% > %d%", pkg,a,b}}' changes.cover > diff
+        cat diff
