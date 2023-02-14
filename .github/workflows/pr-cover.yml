@@ -14,7 +14,7 @@ jobs:
       uses: thollander/actions-comment-pull-request@v2
       with:
         mode: recreate
-        GITHUB_TOKEN: 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
+        GITHUB_TOKEN: ${{ secrets.COMMENTER_TOKEN }}
         pr_number: 1
         comment_tag: Coverdiff
         message: |
