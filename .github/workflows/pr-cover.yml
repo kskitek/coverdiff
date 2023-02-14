@@ -10,16 +10,6 @@ jobs:
     name: Coverage
     runs-on: ubuntu-latest
     steps:
-    - name: 'Comment PR'
-      uses: thollander/actions-comment-pull-request@v2
-      with:
-        mode: recreate
-        GITHUB_TOKEN: ${{ secrets.COMMENTER_TOKEN }}
-        pr_number: 1
-        comment_tag: Coverdiff
-        message: |
-          _Coverdiff_
-          Test coverage comment
     - name: 'Checkout A'
       uses: actions/checkout@v3
       with:
@@ -55,18 +45,24 @@ jobs:
         CHANGES=$(cat diff | wc -l)
         echo "CHANGES=$CHANGES" >> $GITHUB_ENV
         echo "## $CHANGES"
+        # - name: 'Checkout A again'
+        #   # Need to checkout PR branch again so that the comment action is able to find the right PR
+        #   uses: actions/checkout@v3
+        #   with:
+        #     ref: ${{ github.event.pull_request.head.sha }}
+        #     fetch-depth: '1'
     - name: 'Test'
       # if: env.CHANGES != null
       run: echo ${{ env.CHANGES }}
     - name: 'Comment PR'
       #if: env.CHANGES != null
       uses: thollander/actions-comment-pull-request@v2
-        #      env:
-        #        GITHUB_TOKEN: ${{ secrets.COMMENTER_TOKEN }}
       with:
-        #mode: recreate
-        #comment_tag: coverdiff
+        GITHUB_TOKEN: ${{ secrets.COMMENTER_TOKEN }}
+        pr_number: ${{ github.event.pull_request.number }}
+        comment_tag: Coverdiff
         message: |
+          _Coverdiff_
           There are test changes!
 
   #${{ env.CHANGES }}
