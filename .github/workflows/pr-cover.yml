@@ -28,32 +28,24 @@ jobs:
     - name: 'Checkout B'
       uses: actions/checkout@v3
       with:
-        path: main
-        ref: main
-        # ${{ github.event.pull_request.base.sha }}
-        # ref: ${{ inputs.base }} TODO
-        #ref: main
+        path: base
+        ref: ${{ github.event.pull_request.base.sha }}
         fetch-depth: '1'
     - name: 'Generate coverage B'
-      working-directory: main
+      working-directory: base
       run: go test -cover ./... | grep -v "no test files" | awk '{print $2,$5}' | sed -e 's/%//' > b.cover
     - name: 'Generate diff'
       run: |
         cat a.cover > sum.cover
-        cat main/b.cover >> sum.cover
+        cat base/b.cover >> sum.cover
         cat sum.cover | sort | uniq -u > changes.cover
         awk 'NR % 2 != 0 {pkg=$1; a=$2} NR % 2 == 0 {b=$2;
           if (a < b) {printf "%s %d% < %d%", pkg,a,b};
           if (a > b) {printf "%s %d% > %d%", pkg,a,b}}' changes.cover > diff
         cat diff
-        CHANGES=$(cat diff | wc -l)
+        CHANGES=$(cat diff)
         echo "CHANGES=$CHANGES" >> $GITHUB_ENV
-        echo "## $CHANGES"
-    - name: 'Test'
-      # if: env.CHANGES != null
-      run: echo ${{ env.CHANGES }}
     - name: 'Comment PR'
-      #if: env.CHANGES != null
       uses: thollander/actions-comment-pull-request@v2
       with:
         #GITHUB_TOKEN: ${{ secrets.COMMENTER_TOKEN }}
@@ -61,6 +53,5 @@ jobs:
         # need the PR number argument because after checkingout B we are no longer on the right branch
         comment_tag: Coverdiff
         message: |
-          _Coverdiff_
-          There are test changes!
+          _Coverdiff_ Test coverage changes:
           ${{ env.CHANGES }}
