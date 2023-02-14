@@ -13,7 +13,13 @@ jobs:
     - name: 'Comment PR'
       uses: thollander/actions-comment-pull-request@v2
       with:
-        message: "test comment"
+        mode: recreate
+        GITHUB_TOKEN: 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
+        pr_number: 1
+        comment_tag: Coverdiff
+        message: |
+          _Coverdiff_
+          Test coverage comment
     - name: 'Checkout A'
       uses: actions/checkout@v3
       with:
@@ -50,7 +56,7 @@ jobs:
         echo "CHANGES=$CHANGES" >> $GITHUB_ENV
         echo "## $CHANGES"
     - name: 'Test'
-      if: env.CHANGES != null
+      # if: env.CHANGES != null
       run: echo ${{ env.CHANGES }}
     - name: 'Comment PR'
       #if: env.CHANGES != null
