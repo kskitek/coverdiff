@@ -43,7 +43,7 @@ jobs:
         cat base/b.cover >> sum.cover
         cat sum.cover | sort | uniq -u > changes.cover
         awk 'NR % 2 != 0 {pkg=$1; a=$2} NR % 2 == 0 {b=$2;
-          if (a < b) {printf "| %s | %d% | %d% | :heavy_check_mark: |", pkg,a,b};
+          if (a <= b) {printf "| %s | %d% | %d% | :heavy_check_mark: |", pkg,a,b};
           if (a > b) {printf "| %s | %d% | %d% | :x: |", pkg,a,b}}' changes.cover >> diff
         cat diff
     - name: 'Comment PR'
