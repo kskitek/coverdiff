@@ -36,12 +36,12 @@ jobs:
       run: go test -cover ./... | grep -v "no test files" | awk '{print $2,$5}' | sed -e 's/%//' > b.cover
     - name: 'Generate diff'
       run: |
+        echo "| Package | Before | After |" > diff
+        echo "|-|-|-|" >> diff
         cat a.cover > sum.cover
         cat base/b.cover >> sum.cover
         cat sum.cover | sort | uniq -u > changes.cover
-        awk 'NR % 2 != 0 {pkg=$1; a=$2} NR % 2 == 0 {b=$2;
-          if (a < b) {printf "%s %d% < %d%", pkg,a,b};
-          if (a > b) {printf "%s %d% > %d%", pkg,a,b}}' changes.cover > diff
+        awk 'NR % 2 != 0 {pkg=$1; a=$2} NR % 2 == 0 {b=$2; printf "| %s | %d% | %d% |", pkg,a,b}' changes.cover >> diff
         cat diff
         CHANGES=$(cat diff)
         echo "CHANGES=$CHANGES" >> $GITHUB_ENV
@@ -53,5 +53,6 @@ jobs:
         # need the PR number argument because after checkingout B we are no longer on the right branch
         comment_tag: Coverdiff
         message: |
-          _Coverdiff_ Test coverage changes:
+          Test coverage changes:
           ${{ env.CHANGES }}
+
