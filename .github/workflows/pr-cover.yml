@@ -45,12 +45,6 @@ jobs:
         CHANGES=$(cat diff | wc -l)
         echo "CHANGES=$CHANGES" >> $GITHUB_ENV
         echo "## $CHANGES"
-        # - name: 'Checkout A again'
-        #   # Need to checkout PR branch again so that the comment action is able to find the right PR
-        #   uses: actions/checkout@v3
-        #   with:
-        #     ref: ${{ github.event.pull_request.head.sha }}
-        #     fetch-depth: '1'
     - name: 'Test'
       # if: env.CHANGES != null
       run: echo ${{ env.CHANGES }}
@@ -58,11 +52,10 @@ jobs:
       #if: env.CHANGES != null
       uses: thollander/actions-comment-pull-request@v2
       with:
-        GITHUB_TOKEN: ${{ secrets.COMMENTER_TOKEN }}
+        #GITHUB_TOKEN: ${{ secrets.COMMENTER_TOKEN }}
         pr_number: ${{ github.event.pull_request.number }}
         comment_tag: Coverdiff
         message: |
           _Coverdiff_
           There are test changes!
-
-  #${{ env.CHANGES }}
+          ${{ env.CHANGES }}
