@@ -37,12 +37,14 @@ jobs:
     - name: 'Generate diff'
       run: |
         echo "Test coverage changes:" > diff
-        echo "| Package | Before | After |" >> diff
-        echo "|-|-|-|" >> diff
+        echo "| Package | Before | After | Diff |" >> diff
+        echo "|-|-|-|-|" >> diff
         cat a.cover > sum.cover
         cat base/b.cover >> sum.cover
         cat sum.cover | sort | uniq -u > changes.cover
-        awk 'NR % 2 != 0 {pkg=$1; a=$2} NR % 2 == 0 {b=$2; printf "| %s | %d% | %d% |", pkg,a,b}' changes.cover >> diff
+        awk 'NR % 2 != 0 {pkg=$1; a=$2} NR % 2 == 0 {b=$2;
+          if (a < b) {printf "| %s | %d% | %d% | :heavy_check_mark: |", pkg,a,b};
+          if (a > b) {printf "| %s | %d% | %d% | :x: |", pkg,a,b}}' changes.cover >> diff
         cat diff
     - name: 'Comment PR'
       uses: thollander/actions-comment-pull-request@v2
