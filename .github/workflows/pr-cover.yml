@@ -55,4 +55,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.COMMENTER_TOKEN }}
       with:
         message: |
-          There are test changes ${{ env.CHANGES }}
+          There are test changes!
+
+  #${{ env.CHANGES }}
