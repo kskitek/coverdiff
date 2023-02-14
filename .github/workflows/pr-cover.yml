@@ -51,9 +51,11 @@ jobs:
     - name: 'Comment PR'
       #if: env.CHANGES != null
       uses: thollander/actions-comment-pull-request@v2
-      env:
-        GITHUB_TOKEN: ${{ secrets.COMMENTER_TOKEN }}
+        #      env:
+        #        GITHUB_TOKEN: ${{ secrets.COMMENTER_TOKEN }}
       with:
+        #mode: recreate
+        #comment_tag: coverdiff
         message: |
           There are test changes!
 
