@@ -1,5 +1,5 @@
 name: 'Go cover diff'
-description: ''
+description: 'Action that comments PR with test coverage changes summary.'
 branding:
   icon: 'eye'
   color: 'blue'
