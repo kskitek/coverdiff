@@ -19,4 +19,4 @@ jobs:
     - run: ls -l
     - name: Go cover diff
       # uses: kskitek/coverdiff@v0.2.0
-      uses: ./action.yml
+      uses: action.yml
