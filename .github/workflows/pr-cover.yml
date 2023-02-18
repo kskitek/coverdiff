@@ -14,44 +14,5 @@ jobs:
     name: Coverage
     runs-on: ubuntu-latest
     steps:
-    - name: 'Checkout A'
-      uses: actions/checkout@v3
-      with:
-        ref: ${{ github.event.pull_request.head.sha }}
-        fetch-depth: '1'
-    - name: 'Setup Golang'
-      uses: actions/setup-go@v3
-      with:
-        go-version: '1.20'
-    - name: 'Generate coverage A'
-      run: go test -cover ./... | grep -v "no test files" | awk '{print $2,$5}' | sed -e 's/%//' > a.cover
-    - name: 'Checkout B'
-      uses: actions/checkout@v3
-      with:
-        path: base
-        ref: ${{ github.event.pull_request.base.sha }}
-        fetch-depth: '1'
-    - name: 'Generate coverage B'
-      working-directory: base
-      run: go test -cover ./... | grep -v "no test files" | awk '{print $2,$5}' | sed -e 's/%//' > b.cover
-    - name: 'Generate diff'
-      run: |
-        echo "Test coverage changes:" > diff
-        echo "| Package | Before | After | Diff |" >> diff
-        echo "|-|-|-|-|" >> diff
-        cat a.cover > sum.cover
-        cat base/b.cover >> sum.cover
-        cat sum.cover | sort | uniq -u > changes.cover
-        awk 'NR % 2 != 0 {pkg=$1; a=$2} NR % 2 == 0 {b=$2;
-          if (a <= b) {printf "| %s | %d% | %d% | :heavy_check_mark: |", pkg,a,b};
-          if (a > b) {printf "| %s | %d% | %d% | :x: |", pkg,a,b}}' changes.cover >> diff
-        cat diff
-    - name: 'Comment PR'
-      uses: thollander/actions-comment-pull-request@v2
-      with:
-        #GITHUB_TOKEN: ${{ secrets.COMMENTER_TOKEN }}
-        pr_number: ${{ github.event.pull_request.number }}
-        # need the PR number argument because after checkingout B we are no longer on the right branch
-        comment_tag: Coverdiff
-        filePath: diff
-
+    - name: Go cover diff
+      uses: kskitek/coverdiff@v0.2.0
