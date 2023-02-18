@@ -16,6 +16,7 @@ jobs:
     steps:
     - name: 'Checkout A'
       uses: actions/checkout@v3
+    - run: ls -l
     - name: Go cover diff
       # uses: kskitek/coverdiff@v0.2.0
       uses: ./action.yml
