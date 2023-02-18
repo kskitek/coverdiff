@@ -25,7 +25,8 @@ jobs:
       uses: kskitek/coverdiff@v0.3.0
 ```
 
-See [test repository with examples]()
+See [test repository with examples](https://github.com/kskitek/coverdiff-example/pull/2)
+
 ![coverage report](./coverage_report.png)
 
 ## Permissions / Troubleshooting
