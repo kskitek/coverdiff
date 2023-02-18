@@ -17,5 +17,4 @@ jobs:
     - name: 'Checkout'
       uses: actions/checkout@v3
     - name: Go cover diff
-      # uses: kskitek/coverdiff@v0.2.0
-      uses: ./action.yml
+      uses: kskitek/coverdiff@v0.3.0
