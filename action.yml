@@ -23,7 +23,10 @@ runs:
         go-version: '1.20'
     - name: 'Generate coverage A'
       shell: bash
-      run: go test -cover ./... | grep -v "no test files" | awk '{print $2,$5}' | sed -e 's/%//' > a.cover
+      run: paste go.mod go.sum
+    - name: 'Generate coverage A'
+      shell: bash
+      run: go test -cover ./... | grep -v "no test files" | awk '{printf "%s a %d\n", $2, $5}' | sed -e 's/%//' > a.cover
     - name: 'Checkout B'
       uses: actions/checkout@v3
       with:
@@ -33,7 +36,7 @@ runs:
     - name: 'Generate coverage B'
       working-directory: base
       shell: bash
-      run: go test -cover ./... | grep -v "no test files" | awk '{print $2,$5}' | sed -e 's/%//' > b.cover
+      run: go test -cover ./... | grep -v "no test files" | awk '{printf "%s b %d\n", $2, $5}' | sed -e 's/%//' > b.cover
     - name: 'Generate diff'
       shell: bash
       run: |
@@ -42,10 +45,15 @@ runs:
         echo "|-|-|-|-|" >> diff
         cat a.cover > sum.cover
         cat base/b.cover >> sum.cover
-        cat sum.cover | sort | uniq -u > changes.cover
-        awk 'NR % 2 != 0 {pkg=$1; a=$2} NR % 2 == 0 {b=$2;
-          if (a <= b) {printf "| %s | %d% | %d% | :heavy_check_mark: |", pkg,a,b};
-          if (a > b) {printf "| %s | %d% | %d% | :x: |", pkg,a,b}}' changes.cover >> diff
+        cat sum.cover | sort | uniq | awk '{pkg=$1; side=$2; x=$3;
+          if (side == "a") a=x;
+          if (side == "b") b=x;
+          if (a != "" && b != "") {
+            if (a < b) {printf "| %s | %d% | %d% | :heavy_check_mark: |\n", pkg,a,b};
+            if (a > b) {printf "| %s | %d% | %d% | :x:                |\n", pkg,a,b};
+            a=""; b=""
+          }
+          }' >> diff
         cat diff
     - name: 'Comment PR'
       uses: thollander/actions-comment-pull-request@v2
