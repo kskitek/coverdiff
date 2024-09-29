@@ -13,7 +13,7 @@ runs:
   using: 'composite'
   steps:
     - name: 'Checkout After'
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         ref: ${{ github.event.pull_request.head.sha }}
         fetch-depth: '1'
@@ -30,7 +30,7 @@ runs:
           grep "^\(ok\|FAIL\).*" |\
           awk '{printf "%s %d\n", $2, $5}' > after.cover
     - name: 'Checkout Before'
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         path: base
         ref: ${{ github.event.pull_request.base.sha }}
