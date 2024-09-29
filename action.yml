@@ -12,46 +12,43 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: 'Checkout A'
-      uses: actions/checkout@v3
-      with:
-        ref: ${{ github.event.pull_request.head.sha }}
-        fetch-depth: '1'
     - name: 'Setup Golang'
       uses: actions/setup-go@v5
       with:
         go-version-file: go.mod
-    - name: 'Generate coverage A'
+    - name: 'Checkout After'
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+        fetch-depth: '1'
+    - name: 'Generate coverage After'
       shell: bash
-      run: go test -cover ./... | grep -v "no test files" | awk '{printf "%s a %d\n", $2, $5}' | sed -e 's/%//' > a.cover
-    - name: 'Checkout B'
+      run: |
+        go test -cover ./... |\
+          grep -v "no test files" |\
+          grep -v "\[no statements\]" |\
+          sed 's/^ok//' | sed 's/coverage://' |\
+          sed 's/(cached)//' |\
+          awk '{printf "%s %d\n", $1, $2}' > after.cover
+    - name: 'Checkout Before'
       uses: actions/checkout@v3
       with:
         path: base
         ref: ${{ github.event.pull_request.base.sha }}
         fetch-depth: '1'
-    - name: 'Generate coverage B'
+    - name: 'Generate coverage Before'
       working-directory: base
       shell: bash
-      run: go test -cover ./... | grep -v "no test files" | awk '{printf "%s b %d\n", $2, $5}' | sed -e 's/%//' > b.cover
+      run: |
+        go test -cover ./... |\
+          grep -v "no test files" |\
+          grep -v "\[no statements\]" |\
+          sed 's/^ok//' | sed 's/coverage://' |\
+          sed 's/(cached)//' |\
+          awk '{printf "%s %d\n", $1, $2}' > before.cover
     - name: 'Generate diff'
       shell: bash
-      run: |
-        echo "Test coverage changes:" > diff
-        echo "| Package | Before | After | Diff |" >> diff
-        echo "|-|-|-|-|" >> diff
-        cat a.cover > sum.cover
-        cat base/b.cover >> sum.cover
-        cat sum.cover | sort | uniq | awk '{pkg=$1; side=$2; x=$3;
-          if (side == "a") a=x;
-          if (side == "b") b=x;
-          if (a != "" && b != "") {
-            if (a < b) {printf "| %s | %d% | %d% | :heavy_check_mark: |\n", pkg,a,b};
-            if (a > b) {printf "| %s | %d% | %d% | :x:                |\n", pkg,a,b};
-            a=""; b=""
-          }
-          }' >> diff
-        cat diff
+      run: ./run.sh
     - name: 'Comment PR'
       uses: thollander/actions-comment-pull-request@v2
       with:
