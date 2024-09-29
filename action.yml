@@ -12,15 +12,15 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: 'Setup Golang'
-      uses: actions/setup-go@v5
-      with:
-        go-version-file: go.mod
     - name: 'Checkout After'
       uses: actions/checkout@v3
       with:
         ref: ${{ github.event.pull_request.head.sha }}
         fetch-depth: '1'
+    - name: 'Setup Golang'
+      uses: actions/setup-go@v5
+      with:
+        go-version-file: go.mod
     - name: 'Generate coverage After'
       shell: bash
       run: |
