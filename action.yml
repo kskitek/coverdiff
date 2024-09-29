@@ -46,6 +46,9 @@ runs:
           sed 's/^ok//' | sed 's/coverage://' |\
           sed 's/(cached)//' |\
           awk '{printf "%s %d\n", $1, $2}' > before.cover
+    - name: 'Copy Before'
+      shell: bash
+      run: cp base/before.cover before.cover
     - name: 'Generate diff'
       shell: bash
       run: ./run.sh
